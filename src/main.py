@@ -6,6 +6,7 @@ from auth.auth import auth_backend
 from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 from models.models import user
+from src.operations.router import router_operation
 
 
 app = FastAPI(
@@ -28,6 +29,9 @@ app.include_router(
     prefix='/auth',
     tags=['auth']
 )
+
+app.include_router(router_operation)
+
 
 if __name__ == '__main__':
     uvicorn.run(app)
