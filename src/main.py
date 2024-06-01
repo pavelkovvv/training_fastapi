@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_users import FastAPIUsers
+from fastapi.staticfiles import StaticFiles
 from redis import asyncio as aioredis
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,11 +13,14 @@ from auth.schemas import UserRead, UserCreate
 from models.models import user
 from src.operations.router import router_operation
 from src.tasks.router import router as tasks_router
+from src.pages.router import router as pages_router
 
 
 app = FastAPI(
     title='Trading App'
 )
+
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 fastapi_users = FastAPIUsers[user, int](
     get_user_manager,
@@ -37,6 +41,8 @@ app.include_router(
 
 app.include_router(router_operation)
 app.include_router(tasks_router)
+app.include_router(pages_router)
+
 
 origins = [
     "http://localhost.tiangolo.com",
