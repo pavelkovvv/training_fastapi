@@ -4,6 +4,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_users import FastAPIUsers
 from redis import asyncio as aioredis
+from fastapi.middleware.cors import CORSMiddleware
 
 from auth.auth import auth_backend
 from auth.manager import get_user_manager
@@ -37,11 +38,26 @@ app.include_router(
 app.include_router(router_operation)
 app.include_router(tasks_router)
 
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
 
-@app.on_event("startup")
-async def startup_event():
-    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=['GET', 'POST', 'OPTIONS', 'DELETE', 'PATCH', 'PUT'],
+    allow_headers=["*"],
+)
+
+# @app.on_event("startup")
+# async def startup_event():
+#     redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+#     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 if __name__ == '__main__':
     uvicorn.run(app)
